@@ -14,7 +14,7 @@ CLI interativo para baixar fotos da [Pexels](https://www.pexels.com) em massa. P
 - Filtro por orientação: vertical (TikTok/Reels), horizontal ou quadrado
 - Escolha o tamanho: original, large2x, large, medium, small
 - Organiza as fotos em subpastas por termo de busca
-- ⏭Pula fotos que já foram baixadas (cache)
+- Pula fotos que já foram baixadas (cache)
 - Relatório completo no final com status de cada busca
 - Funciona tanto no modo interativo quanto com flags no terminal
 
