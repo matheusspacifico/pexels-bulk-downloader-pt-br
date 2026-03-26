@@ -1,0 +1,28 @@
+# Virtual environment
+venv/
+.venv/
+
+# API key config (não commitar sua key!)
+.pexels_config.json
+
+# Fotos baixadas
+pexels_photos/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
