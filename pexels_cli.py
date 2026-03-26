@@ -13,6 +13,7 @@ Uso:
     python pexels_cli.py download       → Download interativo
     python pexels_cli.py download -q "dog, cat, bird"
     python pexels_cli.py download -q "dog, cat" -n 5 -o fotos -s large --landscape
+    python pexels_cli.py download -q "dog, cat" -n 5 --unica
 """
 
 import argparse
@@ -20,6 +21,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 try:
@@ -57,6 +59,7 @@ API_BASE = "https://api.pexels.com/v1/search"
 
 VALID_SIZES = ["original", "large2x", "large", "medium", "small", "tiny"]
 VALID_ORIENTATIONS = ["portrait", "landscape", "square"]
+VALID_ORGANIZATIONS = ["pastas", "unica"]
 
 BANNER = r"""
 [bold cyan]
@@ -207,6 +210,7 @@ def cmd_download(
     output_dir: str | None = None,
     size: str | None = None,
     orientation: str | None = None,
+    organization: str | None = None,
 ):
     """Comando: baixar fotos."""
     console.print(BANNER)
@@ -273,6 +277,20 @@ def cmd_download(
             "  📁 Pasta de saída", default="pexels_photos", show_default=True
         )
 
+    if organization is None:
+        console.print(
+            "\n  Organização: [bold]pastas[/bold] (subpasta por termo), [bold]unica[/bold] (tudo junto com timestamp)"
+        )
+        organization = Prompt.ask(
+            "  📂 Organização",
+            default="pastas",
+            show_default=True,
+        )
+
+    if organization not in VALID_ORGANIZATIONS:
+        console.print(f"  [yellow]Organização '{organization}' inválida, usando 'pastas'[/yellow]")
+        organization = "pastas"
+
     # ── Resumo ──
     console.print()
     summary = Table(box=box.ROUNDED, show_header=False, padding=(0, 2))
@@ -283,6 +301,8 @@ def cmd_download(
     summary.add_row("Total estimado", f"~{len(queries) * num_photos} fotos")
     summary.add_row("Orientação", orientation)
     summary.add_row("Tamanho", size)
+    org_label = "Subpastas por termo" if organization == "pastas" else "Pasta única com timestamp"
+    summary.add_row("Organização", org_label)
     summary.add_row("Pasta", output_dir)
     console.print(Panel(summary, title="[bold]Resumo[/bold]", border_style="cyan"))
 
@@ -293,6 +313,12 @@ def cmd_download(
     # ── Download ──
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
+
+    # Define a pasta de destino conforme organização
+    if organization == "unica":
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        flat_dir = out_path / f"download_{timestamp}"
+        flat_dir.mkdir(exist_ok=True)
 
     total_downloaded = 0
     total_skipped = 0
@@ -313,8 +339,10 @@ def cmd_download(
 
         for query in queries:
             slug = slugify(query)
-            scene_dir = out_path / slug
-            scene_dir.mkdir(exist_ok=True)
+
+            if organization == "pastas":
+                scene_dir = out_path / slug
+                scene_dir.mkdir(exist_ok=True)
 
             progress.update(
                 main_task,
@@ -338,7 +366,11 @@ def cmd_download(
                 photo_url = photo["src"].get(size, photo["src"]["large"])
                 photographer = slugify(photo.get("photographer", "unknown"))[:20]
                 filename = f"{slug}_{j}_{photographer}.jpg"
-                filepath = scene_dir / filename
+
+                if organization == "pastas":
+                    filepath = scene_dir / filename
+                else:
+                    filepath = flat_dir / filename
 
                 if filepath.exists():
                     total_skipped += 1
@@ -433,6 +465,7 @@ Exemplos:
   python pexels_cli.py download                     Download interativo
   python pexels_cli.py download -q "dog, cat, bird"
   python pexels_cli.py download -q "dog, cat" -n 5 -o fotos -s large --portrait
+  python pexels_cli.py download -q "dog, cat" -n 5 --unica
         """,
     )
 
@@ -450,6 +483,8 @@ Exemplos:
     dl.add_argument("--portrait", action="store_const", const="portrait", dest="orientation", help="Orientação vertical (TikTok)")
     dl.add_argument("--landscape", action="store_const", const="landscape", dest="orientation", help="Orientação horizontal")
     dl.add_argument("--square", action="store_const", const="square", dest="orientation", help="Orientação quadrada")
+    dl.add_argument("--pastas", action="store_const", const="pastas", dest="organization", help="Separar em subpastas por termo (padrão)")
+    dl.add_argument("--unica", action="store_const", const="unica", dest="organization", help="Pasta única com timestamp")
 
     return parser
 
@@ -470,6 +505,7 @@ def main():
             output_dir=args.output,
             size=args.size,
             orientation=args.orientation,
+            organization=args.organization,
         )
     else:
         cmd_menu()
