@@ -13,7 +13,7 @@ CLI interativo para baixar fotos da [Pexels](https://www.pexels.com) em massa. P
 - Salva sua API key localmente (configura uma vez só)
 - Filtro por orientação: vertical (TikTok/Reels), horizontal ou quadrado
 - Escolha o tamanho: original, large2x, large, medium, small
-- Organiza as fotos em subpastas por termo de busca
+- Organiza as fotos em subpastas por termo de busca ou em pasta única com timestamp
 - Pula fotos que já foram baixadas (cache)
 - Relatório completo no final com status de cada busca
 - Funciona tanto no modo interativo quanto com flags no terminal
@@ -122,6 +122,8 @@ python pexels_cli.py download -q "dog on beach, sunset ocean, tropical island" -
 | `--portrait` | Orientação vertical (ideal pra TikTok/Reels) | padrão |
 | `--landscape` | Orientação horizontal | |
 | `--square` | Orientação quadrada | |
+| `--pastas` | Organiza em subpastas por termo de busca | padrão |
+| `--unica` | Todas as fotos numa pasta única com timestamp | |
 
 ---
 
@@ -145,11 +147,19 @@ python pexels_cli.py download -q "mountain landscape, ocean sunset" -n 10 -s ori
 python pexels_cli.py download -q "coffee shop, workspace minimal" -o fotos_projeto -n 5
 ```
 
+**Baixar tudo numa pasta única (sem subpastas):**
+
+```bash
+python pexels_cli.py download -q "dog, cat, bird" -n 5 --unica
+```
+
 ---
 
 ## Estrutura de saída
 
-O script cria uma pasta organizada assim:
+### Modo `--pastas` (padrão)
+
+Cria subpastas separadas por termo de busca:
 
 ```
 pexels_photos/
@@ -165,7 +175,22 @@ pexels_photos/
 └── ...
 ```
 
-Cada subpasta corresponde a um termo de busca, e cada foto inclui o nome do fotógrafo no arquivo.
+### Modo `--unica`
+
+Todas as fotos vão pra uma única pasta nomeada com timestamp:
+
+```
+pexels_photos/
+└── download_20260326_143022/
+    ├── dog_1_john_doe.jpg
+    ├── dog_2_jane_smith.jpg
+    ├── cat_1_maria_silva.jpg
+    ├── cat_2_alex_wong.jpg
+    ├── bird_1_pedro_souza.jpg
+    └── ...
+```
+
+Cada foto inclui o nome do fotógrafo no arquivo. No modo `--unica`, o prefixo do termo evita colisões entre buscas diferentes.
 
 ---
 
