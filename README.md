@@ -20,14 +20,14 @@ CLI interativo para baixar fotos da [Pexels](https://www.pexels.com) em massa. P
 
 ---
 
-## 🔧 Pré-requisitos
+## Pré-requisitos
 
 - **Python 3.10+** instalado
 - Uma **API key da Pexels** (grátis) → [https://www.pexels.com/api/](https://www.pexels.com/api/)
 
 ---
 
-## 🚀 Instalação
+## Instalação
 
 ### Linux / macOS
 
@@ -169,7 +169,7 @@ Cada subpasta corresponde a um termo de busca, e cada foto inclui o nome do fot�
 
 ---
 
-## 🔄 Uso no dia a dia
+## Uso no dia a dia
 
 Sempre que abrir um terminal novo, lembre de ativar a venv antes de rodar o script:
 
